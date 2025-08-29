@@ -6,22 +6,12 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/bfhl",
-      "dest": "/api/bfhl"
-    },
-    {
-      "src": "/bfhl/(.*)",
-      "dest": "/api/bfhl"
-    }
+  "rewrites": [
+    { "source": "/bfhl", "destination": "/api/bfhl" },
+    { "source": "/bfhl/(.*)", "destination": "/api/bfhl" }
   ],
   "functions": {
-    "api/bfhl.js": {
-      "maxDuration": 10
-    }
+    "api/bfhl.js": { "maxDuration": 10 }
   },
-  "env": {
-    "NODE_ENV": "production"
-  }
+  "env": { "NODE_ENV": "production" }
 }
