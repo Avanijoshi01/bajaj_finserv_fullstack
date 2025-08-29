@@ -11,11 +11,9 @@ const PORT = process.env.PORT || 3000;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration (allow all origins)
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] 
-    : true,
+  origin: true,
   credentials: true
 }));
 
