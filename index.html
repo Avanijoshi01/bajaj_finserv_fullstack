@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFHL API - Vercel Deployment</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .endpoint {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .method {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .get { background: #4CAF50; }
+        .post { background: #FF9800; }
+        .url {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            margin: 10px 0;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+        }
+        input {
+            width: 300px;
+            font-family: monospace;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 BFHL API - Vercel Deployment</h1>
+        
+        <div class="endpoint">
+            <h3><span class="method get">GET</span> API Information</h3>
+            <div class="url">/bfhl</div>
+            <p>Get API information and health check</p>
+            <button onclick="testGet()">Test GET Request</button>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method post">POST</span> Process Data</h3>
+            <div class="url">/bfhl</div>
+            <p>Process input data array and return categorized results</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test POST Request</h3>
+            <input type="text" id="testData" placeholder='["a", "1", "334", "4", "R", "$"]' value='["a", "1", "334", "4", "R", "$"]'>
+            <button onclick="testPost()">Test POST Request</button>
+            <div id="postResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 API Status</h3>
+            <div id="statusResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        async function testGet() {
+            try {
+                const response = await fetch(`${API_BASE}/bfhl`);
+                const data = await response.json();
+                const resultDiv = document.getElementById('statusResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<span class="status success">Status: ${response.status}</span>\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                const resultDiv = document.getElementById('statusResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<span class="status error">Error</span>\n\n${error.message}`;
+            }
+        }
+
+        async function testPost() {
+            try {
+                const inputData = document.getElementById('testData').value;
+                const data = JSON.parse(inputData);
+                
+                const response = await fetch(`${API_BASE}/bfhl`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ data })
+                });
+                
+                const result = await response.json();
+                const resultDiv = document.getElementById('postResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<span class="status ${response.ok ? 'success' : 'error'}">Status: ${response.status}</span>\n\n${JSON.stringify(result, null, 2)}`;
+            } catch (error) {
+                const resultDiv = document.getElementById('postResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<span class="status error">Error</span>\n\n${error.message}`;
+            }
+        }
+
+        // Auto-test GET on page load
+        window.onload = function() {
+            testGet();
+        };
+    </script>
+</body>
+</html>
