@@ -11,6 +11,10 @@ class DataProcessor {
    */
   static processData(data) {
     try {
+      if (!Array.isArray(data)) {
+        throw new Error('Input must be an array');
+      }
+
       const numbers = [];
       const alphabets = [];
       const specialChars = [];
@@ -45,6 +49,7 @@ class DataProcessor {
         concat_string: concatString
       };
     } catch (error) {
+      console.error('Data processing error:', error);
       throw new Error(`Data processing failed: ${error.message}`);
     }
   }
@@ -55,6 +60,7 @@ class DataProcessor {
    * @returns {boolean} True if string is a number
    */
   static isNumber(str) {
+    if (typeof str !== 'string') return false;
     return !isNaN(str) && !isNaN(parseFloat(str)) && str.trim() !== '';
   }
 
@@ -64,6 +70,7 @@ class DataProcessor {
    * @returns {boolean} True if string contains only alphabets
    */
   static isAlphabet(str) {
+    if (typeof str !== 'string') return false;
     return /^[a-zA-Z]+$/.test(str);
   }
 
@@ -73,18 +80,23 @@ class DataProcessor {
    * @returns {string} Concatenated string with alternating caps
    */
   static generateConcatString(alphabets) {
-    if (alphabets.length === 0) return '';
+    if (!Array.isArray(alphabets) || alphabets.length === 0) return '';
 
-    // Join all alphabets and reverse the string
-    const reversedString = alphabets.join('').split('').reverse().join('');
-    
-    // Apply alternating caps
-    return reversedString
-      .split('')
-      .map((char, index) => {
-        return index % 2 === 0 ? char.toUpperCase() : char.toLowerCase();
-      })
-      .join('');
+    try {
+      // Join all alphabets and reverse the string
+      const reversedString = alphabets.join('').split('').reverse().join('');
+      
+      // Apply alternating caps
+      return reversedString
+        .split('')
+        .map((char, index) => {
+          return index % 2 === 0 ? char.toUpperCase() : char.toLowerCase();
+        })
+        .join('');
+    } catch (error) {
+      console.error('Error generating concat string:', error);
+      return '';
+    }
   }
 
   /**
@@ -93,12 +105,17 @@ class DataProcessor {
    * @returns {string} User ID in format: fullname_ddmmyyyy
    */
   static generateUserId(fullName = 'john_doe') {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
-    
-    return `${fullName.toLowerCase()}_${day}${month}${year}`;
+    try {
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const year = today.getFullYear();
+      
+      return `${fullName.toLowerCase()}_${day}${month}${year}`;
+    } catch (error) {
+      console.error('Error generating user ID:', error);
+      return 'john_doe_01012025'; // fallback
+    }
   }
 
   /**

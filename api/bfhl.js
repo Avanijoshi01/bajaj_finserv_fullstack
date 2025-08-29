@@ -1,5 +1,22 @@
-const { validateBfhlRequest } = require('../middleware/validation');
+const Joi = require('joi');
 const DataProcessor = require('../utils/dataProcessor');
+
+/**
+ * Validation schema for BFHL API request
+ */
+const bfhlRequestSchema = Joi.object({
+  data: Joi.array().items(
+    Joi.string().min(1).max(100)
+  ).min(1).max(1000).required()
+    .messages({
+      'array.base': 'Data must be an array',
+      'array.min': 'Data array must contain at least one element',
+      'array.max': 'Data array cannot exceed 1000 elements',
+      'any.required': 'Data field is required',
+      'string.min': 'Each element must be at least 1 character long',
+      'string.max': 'Each element cannot exceed 100 characters'
+    })
+});
 
 /**
  * Vercel serverless function for BFHL API
@@ -19,17 +36,26 @@ module.exports = async (req, res) => {
 
   try {
     if (req.method === 'POST') {
-      // Validate request
-      const validationResult = validateBfhlRequest({ body: req.body }, res, () => {});
+      // Validate request body
+      const { error, value } = bfhlRequestSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true
+      });
       
-      if (validationResult && validationResult.error) {
+      if (error) {
+        const errorDetails = error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message
+        }));
+
         return res.status(400).json({
+          error: 'Validation failed',
           is_success: false,
-          error: validationResult.error.details[0].message
+          details: errorDetails
         });
       }
 
-      const { data } = req.body;
+      const { data } = value;
 
       // Process the data
       const processedData = DataProcessor.processData(data);
